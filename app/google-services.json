@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "304257125913",
+    "project_id": "btl-chatapp-6b95f",
+    "storage_bucket": "btl-chatapp-6b95f.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:304257125913:android:580f0f930979c0d44ae488",
+        "android_client_info": {
+          "package_name": "com.example.baitaplon"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCtwfe1qwrvRtGv4Fq9IoKu7_sPBupQhDI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
