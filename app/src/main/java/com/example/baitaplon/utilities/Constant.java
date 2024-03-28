@@ -12,6 +12,7 @@ public class Constant {
     public static final String KEY_USER_ID = "userID";
     public static final String KEY_IMAGE = "image";
     public static final String KEY_FILE_URL = "fileURL";
+    public static final String KEY_FILE_NAME = "fileName";
     public static final String KEY_PHONE = "phone";
     public static final String KEY_FCM_TOKEN = "fcmToken";
     public static final String KEY_USER = "user";
@@ -25,14 +26,16 @@ public class Constant {
     public static final String KEY_RECEIVER_NAME = "receiverName";
     public static final String KEY_SENDER_IMAGE = "senderImage" ;
     public static final String KEY_RECEIVER_IMAGE = "receiverImage";
-    public static final String KEY_SENDER_FILE = "senderFile" ;
-    public static final String KEY_RECEIVER_File = "receiverFile";
     public static final String KEY_LAST_MESSAGE = "lastMessage";
     public static final String KEY_AVAILABILITY = "availability";
+
+
     public static final String REMOTE_MSG_AUTHORIZATION = "Authorization";
     public static final String REMOTE_MSG_CONTENT_TYPE = "Content-Type";
     public static final String REMOTE_MSG_DATA = "data";
     public static final String REMOTE_MSG_REGISTRATION_IDS = "registration_ids";
+
+
     public static final int REQUEST_CODE_PICK_IMAGE = 1;
     public static final int PICK_FILE_REQUEST_CODE = 2;
     public static HashMap<String, String> remoteMsgHeaders = null;
@@ -47,4 +50,10 @@ public class Constant {
         }
         return remoteMsgHeaders;
     }
+
+
+    public String COMETCHAT_APP_ID = "2551178bd72b3958";
+    String COMETCHAT_REGION = "us";
+    String COMETCHAT_AUTH_KEY = "31b9cb316de239e035e991efceb3bb2300210a03";
+    String FIREBASE_REALTIME_DATABASE_URL = "https://btl-chatapp-6b95f-default-rtdb.firebaseio.com";
 }

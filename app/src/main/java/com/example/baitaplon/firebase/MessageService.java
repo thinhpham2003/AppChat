@@ -1,13 +1,13 @@
 package com.example.baitaplon.firebase;
 
 
-import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Intent;
 import android.os.Build;
 import android.util.Log;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.core.app.NotificationCompat;
@@ -17,14 +17,18 @@ import com.example.baitaplon.R;
 import com.example.baitaplon.activity.ChatActivity;
 import com.example.baitaplon.models.User;
 import com.example.baitaplon.utilities.Constant;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 
 import java.util.Random;
 
-public class MesageService extends FirebaseMessagingService {
+public class MessageService extends FirebaseMessagingService {
     @Override
     public void onNewToken(@NonNull String token) {
+        Log.d(TAG, "Refreshed token: " + token);
         super.onNewToken(token);
     }
 

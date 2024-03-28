@@ -113,7 +113,7 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                 binding.txtMsg.setVisibility(View.GONE);
                 binding.txtDate.setVisibility(View.GONE);
                 binding.txtFile.setVisibility(View.GONE);
-            } else if (message.file != null && !message.file.trim().isEmpty()) {
+            } else if (message.fileURL != null && !message.fileURL.trim().isEmpty()) {
                 // Thêm hiển thị file (tùy theo định dạng file)
                 binding.txtFile.setVisibility(View.VISIBLE); // Add a view for files (e.g., TextView with filename)
                 binding.txtMsg.setVisibility(View.GONE);
@@ -121,15 +121,15 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                 binding.txtDate.setVisibility(View.GONE);
 
                 // Hiển thị tên file
-                String fileName = getFileNameFromUrl(message.file);
-                binding.txtFile.setText(fileName);
+                //String fileName = getFileNameFromUrl(message.fileName);
+                binding.txtFile.setText(message.fileName);
                 binding.txtFile.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
                         // Check if file is downloaded
-                        if (isDownloaded(message.file)) {
+                        if (isDownloaded(message.fileURL)) {
                             // Open file
-                            openFile(message.file);
+                            openFile(message.fileURL);
                         } else {
                             // Show message that file is not downloaded
                             Toast.makeText(context, "File chưa được tải xuống", Toast.LENGTH_SHORT).show();
@@ -148,6 +148,7 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
         private String getFileNameFromUrl(String url) {
             String[] parts = url.split("/");
+            Log.d(TAG, "getFileNameFromUrl: " + url);
             return parts[parts.length - 1];
         }
         private Bitmap getImage(String encodeImage) {
@@ -184,7 +185,7 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                 binding.imageView.setImageBitmap(getImage(message.image));
                 binding.txtMsg.setVisibility(View.GONE);
                 binding.txtDate.setVisibility(View.GONE);
-            }else if (message.file != null && !message.file.trim().isEmpty()) {
+            }else if (message.fileURL != null && !message.fileURL.trim().isEmpty()) {
                 // Thêm hiển thị file (tùy theo định dạng file)
                 binding.txtFile.setVisibility(View.VISIBLE); // Add a view for files (e.g., TextView with filename)
                 binding.txtMsg.setVisibility(View.GONE);
@@ -192,13 +193,13 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                 binding.txtDate.setVisibility(View.GONE);
 
                 // Hiển thị tên file
-                String fileName = getFileNameFromUrl(message.file);
-                binding.txtFile.setText(fileName);
+                //String fileName = getFileNameFromUrl(message.fileURL);
+                binding.txtFile.setText(message.fileName);
                 binding.txtFile.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
                         // Download and open file
-                        downloadAndOpenFile(context, message.file);
+                        downloadAndOpenFile(context, message.fileURL);
                     }
                 });
             } else {
@@ -218,6 +219,7 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         private String getFileNameFromUrl(String url) {
             // Lấy tên file từ URL
             String[] parts = url.split("/");
+            Log.d(TAG, "getFileNameFromUrl: " + url);
             return parts[parts.length - 1];
         }
         // Hàm cho phép người gửi mở file khi bấm vào đoạn tin nhắn chứa file

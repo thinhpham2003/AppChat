@@ -50,7 +50,7 @@
         </activity>
 
         <service
-            android:name=".firebase.MesageService"
+            android:name=".firebase.MessageService"
             android:exported="false">
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
@@ -69,6 +69,7 @@
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_color"
             android:resource="@color/white" />
+
 
         <provider
             android:name="androidx.core.content.FileProvider"

@@ -4,20 +4,7 @@
     <value>
       <entry key="app">
         <State>
-          <targetSelectedWithDropDown>
-            <Target>
-              <type value="QUICK_BOOT_TARGET" />
-              <deviceKey>
-                <Key>
-                  <type value="VIRTUAL_DEVICE_PATH" />
-                  <value value="$USER_HOME$/.android/avd/Pixel_5_API_34.avd" />
-                </Key>
-              </deviceKey>
-            </Target>
-          </targetSelectedWithDropDown>
-          <timeTargetWasSelectedWithDropDown value="2024-03-19T14:33:25.173653Z" />
-          <multipleDevicesSelectedInDropDown value="true" />
-          <runningDeviceTargetsSelectedWithDialog>
+          <runningDeviceTargetSelectedWithDropDown>
             <Target>
               <type value="RUNNING_DEVICE_TARGET" />
               <deviceKey>
@@ -27,16 +14,9 @@
                 </Key>
               </deviceKey>
             </Target>
-            <Target>
-              <type value="RUNNING_DEVICE_TARGET" />
-              <deviceKey>
-                <Key>
-                  <type value="VIRTUAL_DEVICE_PATH" />
-                  <value value="$USER_HOME$/.android/avd/Pixel_5_API_34.avd" />
-                </Key>
-              </deviceKey>
-            </Target>
-          </runningDeviceTargetsSelectedWithDialog>
+          </runningDeviceTargetSelectedWithDropDown>
+          <timeTargetWasSelectedWithDropDown value="2024-03-26T16:12:05.778913Z" />
+          <multipleDevicesSelectedInDropDown value="true" />
           <targetsSelectedWithDialog>
             <Target>
               <type value="QUICK_BOOT_TARGET" />

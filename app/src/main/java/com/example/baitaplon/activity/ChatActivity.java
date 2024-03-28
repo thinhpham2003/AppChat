@@ -2,8 +2,14 @@ package com.example.baitaplon.activity;
 
 import static android.content.ContentValues.TAG;
 
+import android.content.ContentValues;
+import android.database.Cursor;
+
+import com.example.baitaplon.helpers.DatabaseHelper;
+
 import android.content.ContentResolver;
 import android.content.Intent;
+import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
@@ -67,6 +73,7 @@ import com.google.firebase.storage.UploadTask;
 public class ChatActivity extends BaseActivity {
 
     private ActivityChatBinding binding;
+    private DatabaseHelper databaseHelper;
     private User receiverUser;
     private List<Message> messages;
     private ChatAdapter chatAdapter;
@@ -90,6 +97,7 @@ public class ChatActivity extends BaseActivity {
 
     private void init() {
         preferenceManager = new PreferenceManager(getApplicationContext());
+        databaseHelper = new DatabaseHelper(this);
         messages = new ArrayList<>();
         chatAdapter = new ChatAdapter(
                 messages,
@@ -142,8 +150,44 @@ public class ChatActivity extends BaseActivity {
             }
 
         }
+
+
+//        Sqlite
+        ContentValues values = new ContentValues();
+        values.put(DatabaseHelper.COLUMN_SENDER_ID, preferenceManager.getString(Constant.KEY_USER_ID));
+        values.put(DatabaseHelper.COLUMN_RECEIVER_ID, receiverUser.id);
+        values.put(DatabaseHelper.COLUMN_MESSAGE, binding.inpMsg.getText().toString());
+        values.put(DatabaseHelper.COLUMN_DATE_TIME, new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(new Date()));
+        databaseHelper.getWritableDatabase().insert(DatabaseHelper.TABLE_MESSAGES, null, values);
+        Log.d(TAG, "sendMessage: " + values);
+        Log.d(TAG, "sendMessage: " + databaseHelper.getDatabaseName());
+        Log.d(TAG, "sendMessage: " + databaseHelper.getReadableDatabase());
+        Log.d(TAG, "sendMessage: " + databaseHelper.getWritableDatabase());
         binding.inpMsg.setText(null);
+        loadMessagesFromSQLite();
     }
+
+
+    private void loadMessagesFromSQLite() {
+        Cursor cursor = databaseHelper.getReadableDatabase().query(
+                DatabaseHelper.TABLE_MESSAGES,
+                new String[] {
+                        DatabaseHelper.COLUMN_SENDER_ID,
+                        DatabaseHelper.COLUMN_RECEIVER_ID,
+                        DatabaseHelper.COLUMN_MESSAGE,
+                        DatabaseHelper.COLUMN_DATE_TIME
+                },
+                DatabaseHelper.COLUMN_SENDER_ID + "=? AND " + DatabaseHelper.COLUMN_RECEIVER_ID + "=?",
+                new String[] {preferenceManager.getString(Constant.KEY_USER_ID), receiverUser.id},
+                null, null, DatabaseHelper.COLUMN_DATE_TIME + " ASC"
+        );
+        while (cursor.moveToNext()) {
+            // Tạo một đối tượng Message mới và thêm vào danh sách tin nhắn
+        }
+        cursor.close();
+    }
+
+
 
     private void showToast(String message) {
         Toast.makeText(getApplicationContext(), message, Toast.LENGTH_SHORT).show();
@@ -156,6 +200,9 @@ public class ChatActivity extends BaseActivity {
         ).enqueue(new Callback<String>() {
             @Override
             public void onResponse(Call<String> call, Response<String> response) {
+                // Log the entire server response
+                Log.i(TAG, "Server Response: " + response.body());
+
                 if (response.isSuccessful()) {
                     try {
                         if (response.body() != null) {
@@ -163,19 +210,22 @@ public class ChatActivity extends BaseActivity {
                             JSONArray results = responseJson.getJSONArray("result");
                             if (responseJson.getInt("failure") == 1) {
                                 JSONObject error = (JSONObject) results.get(0);
+                                Log.e(TAG, "onResponse: Fail1 " + error);
                                 showToast(error.getString("error"));
                                 return;
                             }
-
                         }
                     } catch (JSONException e) {
+                        Log.e(TAG, "onResponse: Fail2 " + e);
                         e.printStackTrace();
                     }
                     showToast("Notification sent successfully");
                 } else {
+                    Log.e(TAG, "onResponse: Fail3 " + response.code());
                     showToast("Error: " + response.code());
                 }
             }
+
 
             @Override
             public void onFailure(Call<String> call, Throwable t) {
@@ -237,7 +287,8 @@ public class ChatActivity extends BaseActivity {
                     message.receiverId = documentChange.getDocument().getString(Constant.KEY_RECEIVER_ID);
                     message.message = documentChange.getDocument().getString(Constant.KEY_MESSAGE);
                     message.image = documentChange.getDocument().getString(Constant.KEY_IMAGE);
-                    message.file = documentChange.getDocument().getString(Constant.KEY_FILE_URL);
+                    message.fileURL = documentChange.getDocument().getString(Constant.KEY_FILE_URL);
+                    message.fileName = documentChange.getDocument().getString(Constant.KEY_FILE_NAME);
                     message.dateTime = getReadableDateTime(documentChange.getDocument().getDate(Constant.KEY_TIMESTAMP));
                     message.dateObject = documentChange.getDocument().getDate(Constant.KEY_TIMESTAMP);
                     messages.add(message);
@@ -333,6 +384,7 @@ public class ChatActivity extends BaseActivity {
     protected void onResume() {
         super.onResume();
         listenAvailabilityOfReceiver();
+        loadMessagesFromSQLite();
     }
 
 
@@ -427,8 +479,17 @@ public class ChatActivity extends BaseActivity {
     }
 
     private void uploadFile(Uri fileUri) {
-        String fileName = UUID.randomUUID().toString();
+
+        String fileName = null;
+        if (fileUri.getPath() != null) {
+            fileName = new File(fileUri.getPath()).getName();
+        } else {
+            fileName = UUID.randomUUID().toString();
+        }
+
         StorageReference fileRef = FirebaseStorage.getInstance().getReference().child("uploads").child(fileName);
+        final String finalFileName = fileName;
+
         fileRef.putFile(fileUri)
                 .addOnSuccessListener(taskSnapshot -> {
                     // Get a URL to the uploaded content
@@ -436,8 +497,8 @@ public class ChatActivity extends BaseActivity {
                     while (!urlTask.isSuccessful()) ;
                     Uri downloadUrl = urlTask.getResult();
 
-                    // Add the file URL to the chat message
-                    sendMessageWithFile(downloadUrl.toString());
+                    // Add the file URL and file name to the chat message
+                    sendMessageWithFile(downloadUrl.toString(), finalFileName);
                     showToast("Success");
                 })
                 .addOnFailureListener(exception -> {
@@ -447,11 +508,12 @@ public class ChatActivity extends BaseActivity {
     }
 
 
-    private void sendMessageWithFile(String fileUrl) {
+    private void sendMessageWithFile(String fileUrl, String fileName) {
         HashMap<String, Object> message = new HashMap<>();
         message.put(Constant.KEY_SENDER_ID, preferenceManager.getString(Constant.KEY_USER_ID));
         message.put(Constant.KEY_RECEIVER_ID, receiverUser.id);
         message.put(Constant.KEY_FILE_URL, fileUrl);
+        message.put(Constant.KEY_FILE_NAME, fileName);
         message.put(Constant.KEY_TIMESTAMP, new Date());
         db.collection(Constant.KEY_COLLECTION_CHAT).add(message);
 
@@ -489,29 +551,6 @@ public class ChatActivity extends BaseActivity {
             }
         }
     }
-
-    private void downloadFile(String fileUrl) {
-        StorageReference fileRef = FirebaseStorage.getInstance().getReferenceFromUrl(fileUrl);
-
-        File localFile = null;
-        try {
-            localFile = File.createTempFile("images", "jpg");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        if (localFile != null) {
-            fileRef.getFile(localFile)
-                    .addOnSuccessListener(taskSnapshot -> {
-                        // Local temp file has been created
-                        Toast.makeText(getApplicationContext(), "File Downloaded", Toast.LENGTH_LONG).show();
-                    }).addOnFailureListener(exception -> {
-                        // Handle any errors
-                        Toast.makeText(getApplicationContext(), "Download Failed", Toast.LENGTH_LONG).show();
-                    });
-        }
-    }
-
 
 
 }
