@@ -14,7 +14,7 @@ import java.util.List;
 
 public class ChatDatabaseHelper extends SQLiteOpenHelper {
 
-    private static final String DATABASE_NAME = "chat.db";
+    private static final String DATABASE_NAME = "message.db";
     private static final int DATABASE_VERSION = 1;
 
     public ChatDatabaseHelper(Context context) {
@@ -31,7 +31,8 @@ public class ChatDatabaseHelper extends SQLiteOpenHelper {
                 "timestamp TEXT, " +
                 "image TEXT, " +
                 "file_url TEXT, " +
-                "file_name TEXT " +
+                "file_name TEXT, " +
+                "location TEXT " +
                 ");");
     }
 
@@ -40,7 +41,7 @@ public class ChatDatabaseHelper extends SQLiteOpenHelper {
         // Xử lý nâng cấp database (nếu cần)
     }
 
-    public void addMessage(String senderId, String receiverId, String message, String timestamp, String image, String fileUrl, String fileName) {
+    public void addMessage(String senderId, String receiverId, String message, String timestamp, String image, String fileUrl, String fileName, String location) {
         SQLiteDatabase db = getWritableDatabase();
 
         ContentValues values = new ContentValues();
@@ -51,8 +52,10 @@ public class ChatDatabaseHelper extends SQLiteOpenHelper {
         values.put("image", image);
         values.put("file_url", fileUrl);
         values.put("file_name", fileName);
+        values.put("location", fileName);
 
         db.insert("messages", null, values);
+        db.close();
     }
     @SuppressLint("Range")
     public List<Message> getAllMessages() {
@@ -70,13 +73,16 @@ public class ChatDatabaseHelper extends SQLiteOpenHelper {
             message.setImage(cursor.getString(cursor.getColumnIndex("image")));
             message.setFileURL(cursor.getString(cursor.getColumnIndex("file_url")));
             message.setFileName(cursor.getString(cursor.getColumnIndex("file_name")));
-
+            message.setLocation(cursor.getString(cursor.getColumnIndex("location")));
             messages.add(message);
         }
 
         cursor.close();
         return messages;
     }
+
+
+
 
 
 }

@@ -3,8 +3,17 @@ package com.example.baitaplon.models;
 import java.util.Date;
 
 public class Message {
-    public String senderId, receiverId, message, dateTime, image, fileURL, fileName;
+    public String senderId, receiverId, message, dateTime, image, fileURL, fileName, location;
     public Date dateObject;
+
+    public String getLocation() {
+        return location;
+    }
+
+    public void setLocation(String location) {
+        this.location = location;
+    }
+
     public String conversionId, conversionName, conversionImage;
 
     public String getSenderId() {

@@ -3,8 +3,10 @@ package com.example.baitaplon.activity;
 import static android.content.ContentValues.TAG;
 
 import android.content.ContentValues;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 
+import com.example.baitaplon.helpers.ChatDatabaseHelper;
 import com.example.baitaplon.helpers.DatabaseHelper;
 
 import android.content.ContentResolver;
@@ -23,6 +25,8 @@ import com.example.baitaplon.network.ApiClient;
 import com.example.baitaplon.network.ApiService;
 import com.example.baitaplon.utilities.Constant;
 import com.example.baitaplon.utilities.PreferenceManager;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
@@ -32,6 +36,7 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.OnProgressListener;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import android.util.Base64;
@@ -39,9 +44,13 @@ import android.util.Log;
 import android.view.View;
 import android.webkit.MimeTypeMap;
 import android.widget.Toast;
+import android.Manifest;
+
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -79,15 +88,19 @@ public class ChatActivity extends BaseActivity {
     private ChatAdapter chatAdapter;
     private PreferenceManager preferenceManager;
     private FirebaseFirestore db;
-
+    private ChatDatabaseHelper dbHelper;
     private String conversionId = null;
     private Boolean isReceiverAvailable = false;
+    private static final int LOCATION_PERMISSION_REQUEST_CODE = 1001;
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         binding = ActivityChatBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
+        dbHelper = new ChatDatabaseHelper(this);
         setListeners();
         loadReceiverDetails();
         init();
@@ -151,20 +164,10 @@ public class ChatActivity extends BaseActivity {
 
         }
 
-
-//        Sqlite
-        ContentValues values = new ContentValues();
-        values.put(DatabaseHelper.COLUMN_SENDER_ID, preferenceManager.getString(Constant.KEY_USER_ID));
-        values.put(DatabaseHelper.COLUMN_RECEIVER_ID, receiverUser.id);
-        values.put(DatabaseHelper.COLUMN_MESSAGE, binding.inpMsg.getText().toString());
-        values.put(DatabaseHelper.COLUMN_DATE_TIME, new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(new Date()));
-        databaseHelper.getWritableDatabase().insert(DatabaseHelper.TABLE_MESSAGES, null, values);
-        Log.d(TAG, "sendMessage: " + values);
-        Log.d(TAG, "sendMessage: " + databaseHelper.getDatabaseName());
-        Log.d(TAG, "sendMessage: " + databaseHelper.getReadableDatabase());
-        Log.d(TAG, "sendMessage: " + databaseHelper.getWritableDatabase());
+        dbHelper.addMessage(preferenceManager.getString(Constant.KEY_USER_ID), receiverUser.id, binding.inpMsg.getText().toString(),
+                String.valueOf(new Date()), "", "", "", "");
         binding.inpMsg.setText(null);
-        loadMessagesFromSQLite();
+
     }
 
 
@@ -219,10 +222,10 @@ public class ChatActivity extends BaseActivity {
                         Log.e(TAG, "onResponse: Fail2 " + e);
                         e.printStackTrace();
                     }
-                    showToast("Notification sent successfully");
+                    showToast("Đã gửi");
                 } else {
                     Log.e(TAG, "onResponse: Fail3 " + response.code());
-                    showToast("Error: " + response.code());
+                    showToast("Lỗi không thể gửi: " + response.code());
                 }
             }
 
@@ -289,6 +292,7 @@ public class ChatActivity extends BaseActivity {
                     message.image = documentChange.getDocument().getString(Constant.KEY_IMAGE);
                     message.fileURL = documentChange.getDocument().getString(Constant.KEY_FILE_URL);
                     message.fileName = documentChange.getDocument().getString(Constant.KEY_FILE_NAME);
+                    message.location = documentChange.getDocument().getString(Constant.KEY_LOCATION);
                     message.dateTime = getReadableDateTime(documentChange.getDocument().getDate(Constant.KEY_TIMESTAMP));
                     message.dateObject = documentChange.getDocument().getDate(Constant.KEY_TIMESTAMP);
                     messages.add(message);
@@ -329,6 +333,7 @@ public class ChatActivity extends BaseActivity {
         binding.layoutSend.setOnClickListener(v -> sendMessage());
         binding.imgSendIMG.setOnClickListener(v -> sendImage());
         binding.imgSendFile.setOnClickListener(v -> pickFile());
+        binding.imgSendLocation.setOnClickListener(v -> sendLocation());
     }
 
     private String getReadableDateTime(Date date) {
@@ -433,7 +438,7 @@ public class ChatActivity extends BaseActivity {
         db.collection(Constant.KEY_COLLECTION_CHAT).add(message);
 
         if (conversionId != null) {
-            updateConversion("Image"); // Đây là tin nhắn cho ảnh
+            updateConversion("Ảnh");
         } else {
             HashMap<String, Object> conversion = new HashMap<>();
             conversion.put(Constant.KEY_SENDER_ID, preferenceManager.getString(Constant.KEY_USER_ID));
@@ -499,10 +504,10 @@ public class ChatActivity extends BaseActivity {
 
                     // Add the file URL and file name to the chat message
                     sendMessageWithFile(downloadUrl.toString(), finalFileName);
-                    showToast("Success");
+                    showToast("Gửi file thành công");
                 })
                 .addOnFailureListener(exception -> {
-                    showToast("Failllll: " + exception);
+                    showToast("Gửi file thất bại: " + exception);
                     Log.d(TAG, "uploadFile: fail" + exception);
                 });
     }
@@ -551,6 +556,90 @@ public class ChatActivity extends BaseActivity {
             }
         }
     }
+
+
+
+    //Location
+    private void sendLocation() {
+        if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            FusedLocationProviderClient fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+            fusedLocationClient.getLastLocation()
+                    .addOnSuccessListener(this, location -> {
+                        if (location != null) {
+                            sendMessageWithLocation(location.getLatitude(), location.getLongitude());
+                        } else {
+                            showToast("Không thể gửi vị trí hiện tại.");
+                        }
+                    });
+        } else {
+            ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION}, LOCATION_PERMISSION_REQUEST_CODE);
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == LOCATION_PERMISSION_REQUEST_CODE) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                sendLocation();
+            } else {
+                showToast("Quyền truy cập vị trí bị từ chối.");
+            }
+        }
+    }
+
+    private void sendMessageWithLocation(double latitude, double longitude) {
+        // Tạo một tin nhắn chứa thông tin vị trí
+        HashMap<String, Object> message = new HashMap<>();
+        message.put(Constant.KEY_SENDER_ID, preferenceManager.getString(Constant.KEY_USER_ID));
+        message.put(Constant.KEY_RECEIVER_ID, receiverUser.id);
+        message.put(Constant.KEY_LOCATION, latitude + ", " + longitude);
+        message.put(Constant.KEY_TIMESTAMP, new Date());
+        db.collection(Constant.KEY_COLLECTION_CHAT).add(message);
+
+        // Cập nhật hoặc thêm cuộc trò chuyện nếu cần
+        if (conversionId != null) {
+            updateConversion("Vị trí");
+        } else {
+            HashMap<String, Object> conversion = new HashMap<>();
+            conversion.put(Constant.KEY_SENDER_ID, preferenceManager.getString(Constant.KEY_USER_ID));
+            conversion.put(Constant.KEY_SENDER_NAME, preferenceManager.getString(Constant.KEY_NAME));
+            conversion.put(Constant.KEY_SENDER_IMAGE, preferenceManager.getString(Constant.KEY_IMAGE));
+            conversion.put(Constant.KEY_RECEIVER_ID, receiverUser.id);
+            conversion.put(Constant.KEY_RECEIVER_NAME, receiverUser.name);
+            conversion.put(Constant.KEY_RECEIVER_IMAGE, receiverUser.image);
+            conversion.put(Constant.KEY_LAST_MESSAGE, latitude + ", " + longitude);
+            conversion.put(Constant.KEY_TIMESTAMP, new Date());
+            addConversion(conversion);
+        }
+
+        if (!isReceiverAvailable) {
+            try {
+                JSONArray tokens = new JSONArray();
+                tokens.put(receiverUser.token);
+
+                JSONObject data = new JSONObject();
+                data.put(Constant.KEY_USER_ID, preferenceManager.getString(Constant.KEY_USER_ID));
+                data.put(Constant.KEY_NAME, preferenceManager.getString(Constant.KEY_NAME));
+                data.put(Constant.KEY_FCM_TOKEN, preferenceManager.getString(Constant.KEY_FCM_TOKEN));
+                data.put(Constant.KEY_LOCATION,  latitude + ", " + longitude);
+                JSONObject body = new JSONObject();
+                body.put(Constant.REMOTE_MSG_DATA, data);
+                body.put(Constant.REMOTE_MSG_REGISTRATION_IDS, tokens);
+                sendNotification(body.toString());
+            } catch (Exception e) {
+                showToast(e.getMessage());
+            }
+        }
+    }
+
+
+
+
+
+
+
+
 
 
 }

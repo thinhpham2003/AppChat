@@ -31,7 +31,6 @@ import java.util.HashMap;
 import java.util.List;
 
 public class ResultLoginActivity extends BaseActivity implements ConversionListener {
-//    TextView txtBack;
 
     private ActivityResultLoginBinding binding;
     private PreferenceManager preferenceManager;
@@ -63,6 +62,8 @@ public class ResultLoginActivity extends BaseActivity implements ConversionListe
         binding.imgSignOut.setOnClickListener(v -> signOut());
         binding.fabNewChat.setOnClickListener(v ->
                 startActivity(new Intent(getApplicationContext(), UserActivity.class)));
+        binding.imgUpdate.setOnClickListener(v ->
+                startActivity(new Intent(getApplicationContext(), UpdateActivity.class)));
     }
 
 
@@ -143,11 +144,11 @@ public class ResultLoginActivity extends BaseActivity implements ConversionListe
                 db.collection(Constant.KEY_COLLECTION_USERS).document(
                         preferenceManager.getString(Constant.KEY_USER_ID));
         documentReference.update(Constant.KEY_FCM_TOKEN, token)
-                .addOnFailureListener(e -> showToast("Unable to update token"));
+                .addOnFailureListener(e -> showToast("Không thể cập nhật token"));
     }
 
     private void signOut() {
-        showToast("Signing out...");
+        showToast("Đăng xuất...");
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         DocumentReference documentReference =
                 db.collection(Constant.KEY_COLLECTION_USERS).document(
@@ -161,7 +162,7 @@ public class ResultLoginActivity extends BaseActivity implements ConversionListe
                     startActivity(new Intent(getApplicationContext(), SignInActivity.class));
                     finish();
                 })
-                .addOnFailureListener(e -> showToast("Unable to sign out"));
+                .addOnFailureListener(e -> showToast("Không thể đăng xuất"));
     }
 
     @Override
@@ -170,4 +171,13 @@ public class ResultLoginActivity extends BaseActivity implements ConversionListe
         intent.putExtra(Constant.KEY_USER, user);
         startActivity(intent);
     }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        preferenceManager = new PreferenceManager(getApplicationContext());
+        loadUserDetails();
+        getToken();
+    }
+
 }

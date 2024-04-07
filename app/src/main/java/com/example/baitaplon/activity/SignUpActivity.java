@@ -41,8 +41,8 @@ public class SignUpActivity extends AppCompatActivity {
     private String encodedImage;
     private PreferenceManager preferenceManager;
     private FirebaseAuth mAuth;
-    EditText ipEmail;
 
+    EditText ipEmail;
     EditText ipName;
     EditText ipPass;
     EditText ipPhone;
@@ -50,6 +50,7 @@ public class SignUpActivity extends AppCompatActivity {
     TextView back;
     ImageView avatar;
     TextView addAvt;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -66,7 +67,7 @@ public class SignUpActivity extends AppCompatActivity {
         btnSignUp.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(isValidSignUpDetails()){
+                if (isValidSignUpDetails()) {
                     signUp2();
                 }
 
@@ -87,55 +88,57 @@ public class SignUpActivity extends AppCompatActivity {
             }
         });
     }
-        private void showToast(String msg) {
-            Toast.makeText(getApplicationContext(), msg, Toast.LENGTH_SHORT).show();
-        }
-        private void signUp(){
-            FirebaseFirestore db = FirebaseFirestore.getInstance();
-            HashMap<String, Object> user = new HashMap<>();
-            user.put(Constant.KEY_NAME, ipName.getText().toString());
-            user.put(Constant.KEY_EMAIL, ipEmail.getText().toString());
-            user.put(Constant.KEY_PHONE, ipPhone.getText().toString());
-            user.put(Constant.KEY_IMAGE, encodedImage);
-            db.collection(Constant.KEY_COLLECTION_USERS)
-                    .add(user)
-                    .addOnSuccessListener(documentReference -> {
-                        preferenceManager.putBoolean(Constant.KEY_IS_SIGN_IN, true);
-                        preferenceManager.putString(Constant.KEY_USER_ID, documentReference.getId());
-                        preferenceManager.putString(Constant.KEY_NAME, ipName.getText().toString());
-                        preferenceManager.putString(Constant.KEY_IMAGE, encodedImage);
+
+    private void showToast(String msg) {
+        Toast.makeText(getApplicationContext(), msg, Toast.LENGTH_SHORT).show();
+    }
+
+    private void signUp() {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        HashMap<String, Object> user = new HashMap<>();
+        user.put(Constant.KEY_NAME, ipName.getText().toString());
+        user.put(Constant.KEY_EMAIL, ipEmail.getText().toString());
+        user.put(Constant.KEY_PHONE, ipPhone.getText().toString());
+        user.put(Constant.KEY_IMAGE, encodedImage);
+        db.collection(Constant.KEY_COLLECTION_USERS)
+                .add(user)
+                .addOnSuccessListener(documentReference -> {
+                    preferenceManager.putBoolean(Constant.KEY_IS_SIGN_IN, true);
+                    preferenceManager.putString(Constant.KEY_USER_ID, documentReference.getId());
+                    preferenceManager.putString(Constant.KEY_NAME, ipName.getText().toString());
+                    preferenceManager.putString(Constant.KEY_IMAGE, encodedImage);
 
 
-                        mAuth = FirebaseAuth.getInstance();
-                        mAuth.createUserWithEmailAndPassword(ipEmail.getText().toString(), ipPass.getText().toString())
-                                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
-                                    @Override
-                                    public void onComplete(@NonNull Task<AuthResult> task) {
-                                        if (task.isSuccessful()) {
-                                            // Sign in success, update UI with the signed-in user's information
-                                            Log.d(TAG, "createUserWithEmail:success");
-                                            FirebaseUser user = mAuth.getCurrentUser();
+                    mAuth = FirebaseAuth.getInstance();
+                    mAuth.createUserWithEmailAndPassword(ipEmail.getText().toString(), ipPass.getText().toString())
+                            .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+                                @Override
+                                public void onComplete(@NonNull Task<AuthResult> task) {
+                                    if (task.isSuccessful()) {
+                                        // Sign in success, update UI with the signed-in user's information
+                                        Log.d(TAG, "createUserWithEmail:success");
+                                        FirebaseUser user = mAuth.getCurrentUser();
 
-                                        } else {
-                                            // If sign in fails, display a message to the user.
-                                            Log.w(TAG, "createUserWithEmail:failure", task.getException());
-                                            Toast.makeText(SignUpActivity.this, "Authentication failed.",
-                                                    Toast.LENGTH_SHORT).show();
+                                    } else {
+                                        // If sign in fails, display a message to the user.
+                                        Log.w(TAG, "createUserWithEmail:failure", task.getException());
+                                        Toast.makeText(SignUpActivity.this, "Quá trình xác thực đã thất bại.",
+                                                Toast.LENGTH_SHORT).show();
 
-                                        }
                                     }
-                                });
-                        String hello = "Xin chào " + ipName.getText().toString();
-                        Intent intent = new Intent(getApplicationContext(), ResultLoginActivity.class);
-                        intent.putExtra("username", hello);
+                                }
+                            });
+                    String hello = "Xin chào " + ipName.getText().toString();
+                    Intent intent = new Intent(getApplicationContext(), ResultLoginActivity.class);
+                    intent.putExtra("username", hello);
 
-                        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                        startActivity(intent);
-                    })
-                    .addOnFailureListener(exception -> {
-                        showToast(exception.getMessage());
-                    });
-        }
+                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    startActivity(intent);
+                })
+                .addOnFailureListener(exception -> {
+                    showToast(exception.getMessage());
+                });
+    }
 
     private void signUp2() {
         mAuth = FirebaseAuth.getInstance();
@@ -151,7 +154,7 @@ public class SignUpActivity extends AppCompatActivity {
                             }
                         } else {
                             Log.w(TAG, "createUserWithEmail:failure", task.getException());
-                            Toast.makeText(SignUpActivity.this, "Authentication failed.",
+                            Toast.makeText(SignUpActivity.this, "Quá trình xác thực đã thất bại.",
                                     Toast.LENGTH_SHORT).show();
                         }
                     }
@@ -185,58 +188,58 @@ public class SignUpActivity extends AppCompatActivity {
     }
 
 
-    private String encodedImage(Bitmap bitmap){
-            int previewWidth = 150;
-            int previewHeight = bitmap.getHeight() * previewWidth / bitmap.getWidth();
-            Bitmap previewBitmap = Bitmap.createScaledBitmap(bitmap, previewWidth, previewHeight, false);
-            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-            previewBitmap.compress(Bitmap.CompressFormat.JPEG, 50, byteArrayOutputStream);
-            byte[] bytes = byteArrayOutputStream.toByteArray();
-            return android.util.Base64.encodeToString(bytes, android.util.Base64.DEFAULT);
-        }
+    private String encodedImage(Bitmap bitmap) {
+        int previewWidth = 150;
+        int previewHeight = bitmap.getHeight() * previewWidth / bitmap.getWidth();
+        Bitmap previewBitmap = Bitmap.createScaledBitmap(bitmap, previewWidth, previewHeight, false);
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        previewBitmap.compress(Bitmap.CompressFormat.JPEG, 50, byteArrayOutputStream);
+        byte[] bytes = byteArrayOutputStream.toByteArray();
+        return android.util.Base64.encodeToString(bytes, android.util.Base64.DEFAULT);
+    }
 
-        private final ActivityResultLauncher pickImage = registerForActivityResult(
-                new ActivityResultContracts.StartActivityForResult(),
-                result -> {
-                    if(result.getResultCode() == RESULT_OK) {
-                        if(result.getData() != null) {
-                            Uri imageUri = result.getData().getData();
-                            try {
-                                InputStream inputStream = getContentResolver().openInputStream(imageUri);
-                                Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
-                                avatar.setImageBitmap(bitmap);
-                                 addAvt.setVisibility(View.GONE);
-                                 encodedImage = encodedImage(bitmap);
-                            }catch (FileNotFoundException e) {
-                                e.printStackTrace();
-                            }
+    private final ActivityResultLauncher pickImage = registerForActivityResult(
+            new ActivityResultContracts.StartActivityForResult(),
+            result -> {
+                if (result.getResultCode() == RESULT_OK) {
+                    if (result.getData() != null) {
+                        Uri imageUri = result.getData().getData();
+                        try {
+                            InputStream inputStream = getContentResolver().openInputStream(imageUri);
+                            Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
+                            avatar.setImageBitmap(bitmap);
+                            addAvt.setVisibility(View.GONE);
+                            encodedImage = encodedImage(bitmap);
+                        } catch (FileNotFoundException e) {
+                            e.printStackTrace();
                         }
                     }
                 }
-        );
-        private Boolean isValidSignUpDetails() {
-            if (encodedImage == null) {
-                showToast("Select profile image");
-                return false;
-            }else if(ipName.getText().toString().trim().isEmpty()) {
-                showToast("Enter name");
-                return false;
             }
-            else if(ipEmail.getText().toString().trim().isEmpty()) {
-                showToast("Enter Email");
-                return false;
-            } else if (!Patterns.EMAIL_ADDRESS.matcher(ipEmail.getText().toString()).matches()) {
-                showToast("Enter valid Email");
-                return false;
-            } else if (ipPass.getText().toString().trim().isEmpty()) {
-                showToast("Enter Password");
-                return false;
-            }else if (ipPhone.getText().toString().trim().isEmpty()) {
-                showToast("Enter Phone number");
-                return false;
-            }else {
-                return true;
-            }
+    );
+
+    private Boolean isValidSignUpDetails() {
+        if (encodedImage == null) {
+            showToast("Chọn ảnh đại diện");
+            return false;
+        } else if (ipName.getText().toString().trim().isEmpty()) {
+            showToast("Nhập tên");
+            return false;
+        } else if (ipEmail.getText().toString().trim().isEmpty()) {
+            showToast("Nhập email");
+            return false;
+        } else if (!Patterns.EMAIL_ADDRESS.matcher(ipEmail.getText().toString()).matches()) {
+            showToast("Enter valid Email");
+            return false;
+        } else if (ipPass.getText().toString().trim().isEmpty()) {
+            showToast("Nhập mật khẩu");
+            return false;
+        } else if (ipPhone.getText().toString().trim().isEmpty()) {
+            showToast("Nhập số điện thoại");
+            return false;
+        } else {
+            return true;
         }
+    }
 
 }

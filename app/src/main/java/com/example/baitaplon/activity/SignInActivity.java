@@ -84,11 +84,11 @@ public class SignInActivity extends AppCompatActivity {
             public void onClick(View v) {
                 final EditText resetMail = new EditText(v.getContext());
                 final AlertDialog.Builder passwordResetDialog = new AlertDialog.Builder(v.getContext());
-                passwordResetDialog.setTitle("Reset Password?");
-                passwordResetDialog.setMessage("Enter Your Email To Received Reset Link.");
+                passwordResetDialog.setTitle("Bạn có muốn đặt lại mật khẩu.");
+                passwordResetDialog.setMessage("Nhập email của bạn để đặt lại mật khẩu");
                 passwordResetDialog.setView(resetMail);
 
-                passwordResetDialog.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                passwordResetDialog.setPositiveButton("Có", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         // extract the email and send reset link
@@ -96,16 +96,16 @@ public class SignInActivity extends AppCompatActivity {
                         FirebaseAuth.getInstance().sendPasswordResetEmail(mail)
                                 .addOnSuccessListener(aVoid -> {
                                     Log.d(TAG, "onClick: success " + mail);
-                                    Toast.makeText(SignInActivity.this, "Reset Link Sent To Your Email.", Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(SignInActivity.this, "Liên kết đặt lại mật khẩu đã được gửi đến email của bạn", Toast.LENGTH_SHORT).show();
                                 })
                                 .addOnFailureListener(e -> {
                                     Log.d(TAG, "onClick: " + mail, e);
-                                    Toast.makeText(SignInActivity.this, "Error ! Reset Link is Not Sent" + e.getMessage(), Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(SignInActivity.this, "Lỗi! Chưa thể gửi được email." + e.getMessage(), Toast.LENGTH_SHORT).show();
                                 });
                     }
                 });
 
-                passwordResetDialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
+                passwordResetDialog.setNegativeButton("Không", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         // close the dialog
@@ -137,7 +137,7 @@ public class SignInActivity extends AppCompatActivity {
                         intent.putExtra("loginResult", "Đăng nhập thành công");
                         startActivity(intent);
                     } else {
-                        showToast("Unable to sign in");
+                        showToast("Hiện không thể đăng nhập.");
                     }
                 });
     }
@@ -154,7 +154,7 @@ public class SignInActivity extends AppCompatActivity {
                             }
                         } else {
                             Log.w(TAG, "signInWithEmail:failure", task.getException());
-                            Toast.makeText(SignInActivity.this, "Authentication failed.",
+                            Toast.makeText(SignInActivity.this, "Xác thực người dùng thất bại.",
                                     Toast.LENGTH_SHORT).show();
                         }
                     }
@@ -179,10 +179,10 @@ public class SignInActivity extends AppCompatActivity {
                             intent.putExtra("loginResult", "Đăng nhập thành công");
                             startActivity(intent);
                         } else {
-                            showToast("Unable to fetch user data");
+                            showToast("Không thể tìm thấy dữ liệu người dùng.");
                         }
                     } else {
-                        showToast("Unable to fetch user data");
+                        showToast("Không thể tìm thấy dữ liệu người dùng.");
                     }
                 });
     }
@@ -194,10 +194,10 @@ public class SignInActivity extends AppCompatActivity {
 
     private Boolean isValidSignInDetail() {
         if (binding.inpEmail.getText().toString().trim().isEmpty()) {
-            showToast("Enter email");
+            showToast("Nhập email");
             return false;
         } else if (binding.inpPass.getText().toString().trim().isEmpty()) {
-            showToast("Enter password");
+            showToast("Nhập mật khẩu");
             return false;
         } else {
             return true;

@@ -114,16 +114,14 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                 binding.txtDate.setVisibility(View.GONE);
                 binding.txtFile.setVisibility(View.GONE);
             } else if (message.fileURL != null && !message.fileURL.trim().isEmpty()) {
-                // Thêm hiển thị file (tùy theo định dạng file)
-                binding.txtFile.setVisibility(View.VISIBLE); // Add a view for files (e.g., TextView with filename)
-                binding.txtMsg.setVisibility(View.GONE);
+                binding.txtMsg.setVisibility(View.VISIBLE);
                 binding.imageView.setVisibility(View.GONE);
-                binding.txtDate.setVisibility(View.GONE);
+                binding.txtDate.setVisibility(View.VISIBLE);
 
                 // Hiển thị tên file
                 //String fileName = getFileNameFromUrl(message.fileName);
-                binding.txtFile.setText(message.fileName);
-                binding.txtFile.setOnClickListener(new View.OnClickListener() {
+                binding.txtMsg.setText(message.fileName);
+                binding.txtMsg.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
                         // Check if file is downloaded
@@ -136,12 +134,33 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                         }
                     }
                 });
-            }else {
+            } else if (message.location != null ) {
+                String location = "Vị trí hiện tại: " + message.location;
+                binding.txtMsg.setVisibility(View.VISIBLE);
+                binding.txtMsg.setText(message.location);
+                binding.imageView.setVisibility(View.GONE);
+                binding.txtFile.setVisibility(View.GONE);
+                binding.txtDate.setVisibility(View.VISIBLE);
+                binding.txtDate.setText(message.dateTime);
+                binding.txtMsg.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        // Tạo Intent để mở ứng dụng Google Maps
+                        Uri gmmIntentUri = Uri.parse("geo:" + message.location + "?q=" + message.location);
+                        Intent mapIntent = new Intent(Intent.ACTION_VIEW, gmmIntentUri);
+                        mapIntent.setPackage("com.google.android.apps.maps");
+                        context.startActivity(mapIntent);
+                    }
+                });
+            } else {
                 binding.txtMsg.setText(message.message);
                 binding.imageView.setVisibility(View.GONE);
                 binding.txtMsg.setVisibility(View.VISIBLE);
                 binding.txtFile.setVisibility(View.GONE);
+                binding.txtDate.setVisibility(View.VISIBLE);
+                binding.txtDate.setText(message.dateTime);
             }
+
 
             binding.txtDate.setText(message.dateTime);
         }
@@ -186,26 +205,43 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                 binding.txtMsg.setVisibility(View.GONE);
                 binding.txtDate.setVisibility(View.GONE);
             }else if (message.fileURL != null && !message.fileURL.trim().isEmpty()) {
-                // Thêm hiển thị file (tùy theo định dạng file)
-                binding.txtFile.setVisibility(View.VISIBLE); // Add a view for files (e.g., TextView with filename)
-                binding.txtMsg.setVisibility(View.GONE);
+                binding.txtMsg.setVisibility(View.VISIBLE); // Add a view for files (e.g., TextView with filename)
                 binding.imageView.setVisibility(View.GONE);
-                binding.txtDate.setVisibility(View.GONE);
+                binding.txtDate.setVisibility(View.VISIBLE);
 
-                // Hiển thị tên file
-                //String fileName = getFileNameFromUrl(message.fileURL);
-                binding.txtFile.setText(message.fileName);
-                binding.txtFile.setOnClickListener(new View.OnClickListener() {
+                binding.txtMsg.setText(message.fileName);
+                binding.txtMsg.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        // Download and open file
                         downloadAndOpenFile(context, message.fileURL);
+                    }
+                });
+            } else if (message.location != null ) {
+                binding.txtMsg.setVisibility(View.VISIBLE);
+                binding.txtMsg.setText(message.location);
+                binding.imageView.setVisibility(View.GONE);
+                binding.txtFile.setVisibility(View.GONE);
+                binding.txtDate.setVisibility(View.VISIBLE);
+                binding.txtDate.setText(message.dateTime);
+                binding.txtMsg.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        // Tạo Intent để mở ứng dụng Google Maps
+                        Uri gmmIntentUri = Uri.parse("geo:" + message.location + "?q=" + message.location);
+                        Log.d(TAG, "onClick: " + message.location);
+                        Intent mapIntent = new Intent(Intent.ACTION_VIEW, gmmIntentUri);
+                        mapIntent.setPackage("com.google.android.apps.maps");
+                        context.startActivity(mapIntent);
                     }
                 });
             } else {
                 binding.txtMsg.setText(message.message);
                 binding.imageView.setVisibility(View.GONE);
                 binding.txtMsg.setVisibility(View.VISIBLE);
+                binding.txtFile.setVisibility(View.GONE);
+                binding.txtDate.setVisibility(View.VISIBLE);
+                binding.txtDate.setText(message.dateTime);
+
             }
             binding.txtDate.setText(message.dateTime);
             if(receiverProfileImage != null){

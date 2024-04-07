@@ -15,7 +15,7 @@
         android:layout_marginBottom="16dp"
         android:background="@drawable/background_content_top"
         app:layout_constraintBottom_toTopOf="@id/layoutSend"
-        app:layout_constraintTop_toTopOf="parent"/>
+        app:layout_constraintTop_toTopOf="parent" />
 
     <View
         android:id="@+id/headerBgr"
@@ -23,7 +23,7 @@
         android:layout_height="0dp"
         android:background="@color/primary"
         app:layout_constraintBottom_toTopOf="@id/viewSupporter"
-        app:layout_constraintTop_toTopOf="parent"/>
+        app:layout_constraintTop_toTopOf="parent" />
 
 
     <androidx.appcompat.widget.AppCompatImageView
@@ -35,9 +35,9 @@
         android:layout_marginTop="12dp"
         android:padding="5dp"
         android:src="@drawable/ic_back"
+        android:tint="@color/white"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        android:tint="@color/white"/>
+        app:layout_constraintTop_toTopOf="parent" />
 
     <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/imginfo"
@@ -48,9 +48,10 @@
         android:layout_marginRight="16dp"
         android:padding="4dp"
         android:src="@drawable/ic_info"
+        android:tint="@color/white"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        android:tint="@color/white"/>
+        app:layout_constraintTop_toTopOf="parent" />
+
 
     <TextView
         android:id="@+id/txtName"
@@ -67,14 +68,15 @@
         app:layout_constraintBottom_toBottomOf="@id/imgBack"
         app:layout_constraintEnd_toStartOf="@id/imginfo"
         app:layout_constraintStart_toEndOf="@id/imgBack"
-        app:layout_constraintTop_toTopOf="@id/imgBack"/>
+        app:layout_constraintTop_toTopOf="@id/imgBack" />
+
     <View
         android:id="@id/viewSupporter"
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:background="@color/primary"
         android:layout_marginTop="12sp"
-        app:layout_constraintTop_toBottomOf="@id/imgBack"/>
+        android:background="@color/primary"
+        app:layout_constraintTop_toBottomOf="@id/imgBack" />
 
 
     <androidx.recyclerview.widget.RecyclerView
@@ -85,11 +87,11 @@
         android:orientation="vertical"
         android:overScrollMode="never"
         android:padding="20dp"
-        app:stackFromEnd="true"
         android:visibility="gone"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         app:layout_constraintBottom_toBottomOf="@id/viewBgr"
-        app:layout_constraintTop_toBottomOf="@id/viewSupporter"/>
+        app:layout_constraintTop_toBottomOf="@id/viewSupporter"
+        app:stackFromEnd="true" />
 
     <ProgressBar
         android:id="@+id/pgrBar"
@@ -120,13 +122,13 @@
             android:layout_marginLeft="4dp"
             android:padding="8dp"
             android:src="@drawable/ic_send"
-            android:tint="@color/white"/>
+            android:tint="@color/white" />
 
     </FrameLayout>
 
     <FrameLayout
         android:id="@+id/layoutIcons"
-        android:layout_width="80dp"
+        android:layout_width="wrap_content"
         android:layout_height="40dp"
         android:layout_marginStart="8dp"
         android:layout_marginLeft="8dp"
@@ -134,24 +136,41 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent">
 
-        <androidx.appcompat.widget.AppCompatImageView
-            android:id="@+id/imgSendFile"
-            android:layout_width="30dp"
+        <LinearLayout
+            android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:padding="0dp"
-            android:src="@drawable/ic_send_file"
-            android:tint="@color/white" />
+            android:orientation="horizontal">
 
-        <androidx.appcompat.widget.AppCompatImageView
-            android:id="@+id/imgSendIMG"
-            android:layout_width="30dp"
-            android:layout_height="match_parent"
-            android:layout_marginStart="40dp"
-            android:layout_marginLeft="40dp"
-            android:padding="0dp"
-            android:src="@drawable/ic_send_img"
-            android:tint="@color/white"/>
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/imgSendFile"
+                android:layout_width="30dp"
+                android:layout_height="match_parent"
+                android:padding="0dp"
+                android:src="@drawable/ic_send_file"
+                android:tint="@color/white" />
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/imgSendIMG"
+                android:layout_width="30dp"
+                android:layout_height="match_parent"
+                android:layout_marginStart="10dp"
+                android:layout_marginLeft="10dp"
+                android:padding="0dp"
+                android:src="@drawable/ic_send_img"
+                android:tint="@color/white" />
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/imgSendLocation"
+                android:layout_width="30dp"
+                android:layout_height="match_parent"
+                android:layout_marginStart="10dp"
+                android:layout_marginLeft="10dp"
+                android:padding="0dp"
+                android:src="@drawable/ic_send_location"
+                android:tint="@color/white" />
+        </LinearLayout>
     </FrameLayout>
+
 
     <EditText
         android:id="@+id/inpMsg"
@@ -173,20 +192,19 @@
         android:textColorHint="#EDEBEB"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@id/layoutSend"
-        app:layout_constraintStart_toEndOf="@id/layoutIcons"/>
+        app:layout_constraintStart_toEndOf="@id/layoutIcons" />
 
     <TextView
         android:id="@+id/txtAvailability"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@+id/viewSupporter"
         android:background="#008000"
-        android:textSize="10sp"
-        android:text="Online"
         android:gravity="center"
-        android:textColor="@color/white"
         android:padding="2dp"
+        android:text="Online"
+        android:textColor="@color/white"
+        android:textSize="10sp"
         android:visibility="gone"
-        />
+        app:layout_constraintTop_toBottomOf="@+id/viewSupporter" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

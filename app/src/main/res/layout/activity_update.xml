@@ -6,8 +6,7 @@
     android:clipToPadding="false"
     android:orientation="vertical"
     android:overScrollMode="never"
-    android:scrollbars="none"
-    >
+    android:scrollbars="none">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -20,25 +19,11 @@
             android:layout_height="match_parent"
             android:layout_marginTop="40dp"
             android:gravity="center"
-            android:text="Đăng ký"
+            android:text="Thông tin tài khoản"
             android:textColor="@color/primary_text"
             android:textSize="45sp"
             android:textStyle="bold"
             android:fontFamily="cursive"/>
-
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_marginTop="4dp"
-            android:gravity="center"
-            android:text="Điền đẩy đủ thông tin để đăng ký"
-            android:textColor="@color/secondary_text"
-            android:textSize="19sp"
-            android:textStyle="bold"
-            android:fontFamily="cursive"/>
-
-
 
         <FrameLayout
             android:id="@+id/layoutImage"
@@ -56,14 +41,14 @@
                 app:riv_oval="true">
 
             </com.makeramen.roundedimageview.RoundedImageView>
-            <TextView
-                android:id="@+id/txtAddAvatar"
+            <ProgressBar
+                android:id="@+id/progressBar"
+                style="?android:attr/progressBarStyleSmall"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Thêm ảnh đại diện"
                 android:layout_gravity="center"
-                android:textSize="11sp"
-                android:fontFamily="cursive"/>
+                android:visibility="gone" />
+
         </FrameLayout>
 
         <EditText
@@ -72,15 +57,14 @@
             android:layout_height="50sp"
             android:layout_marginTop="50dp"
             android:background="@drawable/backgound_input"
-            android:hint="Nhập tên của bạn"
+            android:hint="Tên"
             android:imeOptions="actionNext"
             android:importantForAutofill="no"
             android:inputType="textPersonName"
             android:paddingStart="16sp"
             android:paddingEnd="16sp"
             android:textColor="@color/primary_text"
-            android:textSize="15sp"
-            android:fontFamily="cursive"/>
+            android:textSize="13sp" />
 
         <EditText
             android:id="@+id/txEmailSU"
@@ -88,58 +72,40 @@
             android:layout_height="50sp"
             android:layout_marginTop="16dp"
             android:background="@drawable/backgound_input"
-            android:hint="Nhập Email"
+            android:hint="Email"
             android:imeOptions="actionNext"
             android:importantForAutofill="no"
+            android:enabled="false"
             android:inputType="textEmailAddress"
             android:paddingStart="16sp"
             android:paddingEnd="16sp"
             android:textColor="@color/primary_text"
-            android:textSize="15sp"
-            android:fontFamily="cursive"/>
-
-        <EditText
-            android:id="@+id/txtPassSU"
-            android:layout_width="match_parent"
-            android:layout_height="50sp"
-            android:layout_marginTop="16dp"
-            android:background="@drawable/backgound_input"
-            android:hint="Nhập mật khẩu"
-            android:imeOptions="actionNext"
-            android:importantForAutofill="no"
-            android:inputType="textPassword"
-            android:paddingStart="16sp"
-            android:paddingEnd="16sp"
-            android:textColor="@color/primary_text"
-            android:textSize="15sp"
-            android:fontFamily="cursive"/>
-
+            android:textSize="13sp" />
         <EditText
             android:id="@+id/txtPhoneSU"
             android:layout_width="match_parent"
             android:layout_height="50sp"
             android:layout_marginTop="16dp"
             android:background="@drawable/backgound_input"
-            android:hint="Nhập số điện thoại"
+            android:hint="Số điện thoại"
             android:imeOptions="actionNext"
             android:importantForAutofill="no"
             android:inputType="phone"
             android:paddingStart="16sp"
             android:paddingEnd="16sp"
             android:textColor="@color/primary_text"
-            android:textSize="15sp"
-            android:fontFamily="cursive"/>
+            android:textSize="13sp" />
 
         <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnSU"
+            android:id="@+id/btnUpdate"
             android:layout_width="match_parent"
             android:layout_height="50dp"
             android:layout_marginTop="20dp"
-            android:text="Đăng ký"
+            android:text="Cập nhật"
             android:textColor="@color/white"
             android:textStyle="bold"
+            android:textSize="20sp"
             app:cornerRadius="8dp"
-            android:textSize="20dp"
             android:fontFamily="cursive"/>
         <TextView
             android:id="@+id/back"
@@ -147,13 +113,11 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="20dp"
             android:contentDescription="Back button"
-            android:text="Đăng nhập"
+            android:text="Trở về"
             android:layout_gravity="center"
             android:textSize="20dp"
             android:textStyle="bold"
             android:fontFamily="cursive"/>
 
     </LinearLayout>
-
-
 </ScrollView>
